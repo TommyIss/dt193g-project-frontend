@@ -1,35 +1,70 @@
-@import './base.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+/* Body-element */
+/* html {
+    margin: 0;
+    padding: 0;
+} */
+body {
+    background-color: #FFF0DC;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 1600px;
+    border: solid 2px black;
+    line-height: 2.6em;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+table, p {
+    width: 90%;
+    margin: 0 auto;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+p {
+    margin: 1% auto;
+}
+table {
+    border: 1px solid black;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+td {
+    margin: 0 1%;
+    padding: 0 4px;
+    border: 1px solid black;
+    font-size: 0.9em;
+    text-align: center;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+th {
+    background-color: #3B9797;
+    border: 1px solid black;
+    color: white;
+}
+tr:nth-child(even) {
+    background-color: #3B9797;
+    color: white;
+}
+
+button {
+    padding: 0.6em;
+    background-color: #A53860;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #71C0BB;
+}
+#deleteBtn:hover {
+    background-color: crimson;
+}
+@media screen and (max-width: 800px) {
+    table {
+        width: 90%;
+    }
+    table, button {
+        font-size: 0.7em;
+    }
+    td {
+        margin: 0 1%;
+        padding: 0 2px;
+    }
 }
