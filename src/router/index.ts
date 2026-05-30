@@ -1,11 +1,15 @@
 import LoginView from "@/views/LoginView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import StockView from "@/views/StockView.vue";
+import ProductDetailsView from "@/views/ProductDetailsView.vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
     { path: '/', redirect: '/login' },
     { path: '/login', name: 'login', component: LoginView },
-    { path: '/profile' , name: 'profile', component: ProfileView}
+    { path: '/profile' , name: 'profile', component: ProfileView},
+    { path: '/stock', name: 'stock', component: StockView},
+    { path: '/product/:id', name: 'product-details', component: ProductDetailsView}
 ];
 
 const router = createRouter({

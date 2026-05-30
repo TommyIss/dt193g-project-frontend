@@ -33,7 +33,7 @@
                         <RouterLink to="/admin-panel">Adminpanel</RouterLink>
                     </li>
                     <li>
-                        <RouterLink to="/products">Produkter</RouterLink>
+                        <RouterLink to="/stock">Lagersaldo</RouterLink>
                     </li>
                     <li>
                         <button class="btn btn-link nav-link" @click="logout">Logga ut</button>
