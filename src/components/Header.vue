@@ -30,7 +30,7 @@
                     <RouterLink to="/profile">Profil</RouterLink>
                     </li>
                     <li v-if="role === 'admin'">
-                        <RouterLink to="/admin-panel">Adminpanel</RouterLink>
+                        <RouterLink to="/users">Användare</RouterLink>
                     </li>
                     <li>
                         <RouterLink to="/stock">Lagersaldo</RouterLink>

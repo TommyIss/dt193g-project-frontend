@@ -1,0 +1,173 @@
+<template>
+    <h2>Användare</h2>
+
+    <AppDialog ref="dialog" />
+
+    <div v-if="showAddUser === false && role === 'admin'">
+        <button @click="showAddUser = true">Lägg till ny användare <em class="fa-solid fa-circle-plus"></em></button>
+    </div>
+
+    <UserForm 
+        v-if="showAddUser === true"
+        @save="addUser"
+        @close="showAddUser = false"
+    />
+
+    <div v-if="loading" class="alert alert-info">
+        Hämtar användarna...
+    </div>
+    <UsersTable
+        :users="users"
+        :role="role"
+        @updateUser="updateUser"
+        @delete="removeUser"
+    />
+</template>
+
+<script setup>
+    import AppDialog from '@/components/AppDialog.vue';
+    import UserForm from '@/components/UserForm.vue';
+    import UsersTable from '@/components/UsersTable.vue';
+    import { ref, onMounted } from 'vue';
+
+    const users = ref([]);
+    const url = 'https://tois-dt193g-project-webservice.onrender.com/';
+
+    const role = JSON.parse(localStorage.getItem('user'))?.role;
+    const token = localStorage.getItem('token');
+    
+    const loading = ref(true);
+    const dialog = ref(null);
+    const showAddUser = ref(false);
+
+    onMounted(() => {
+        getUsers();
+    })
+
+
+    const getUsers = async() => {
+        loading.value = true;
+        try {
+            const response = await fetch(url + 'users', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if(!response.ok) {
+                const errData = await response.json();
+                dialog.value.show(errData.message[0] || 'Kunde inte uppdatera användaren');
+            }
+
+            const data = await response.json();
+
+            console.log(data);
+            users.value = data;
+
+        } catch (err) {
+            console.error(err);
+            dialog.value.show(err.message || 'Ett fel uppstod vid hämtning av användare');
+            return false;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    const addUser = async(user) => {
+        try {
+            let fetchedUrl = url + 'users/';
+            if(user.role === 'admin') {
+                fetchedUrl = url + 'admin/create-admin';
+            }
+            const response = await fetch(fetchedUrl, {
+                method: 'Post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(user)
+            });
+
+            if(!response.ok) {
+                const errData = await response.json();
+                dialog.value.show(errData.message[0] || 'Kunde inte lägga till användaren');
+                return false;
+            }
+            
+            dialog.value.show('Användaren har lagts till');
+
+            showAddUser.value = false;
+
+            getUsers();
+        } catch (err) {
+            console.error(err);
+            dialog.value.show(err.message || 'Ett fel uppstod vid tillägg av användare');
+        }
+    }
+
+    const editUser = async(id, user) => {
+        try {
+            const response = await fetch(url + 'users/' + id, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(user)
+            });
+
+            if(!response.ok) {
+                const errData = await response.json();
+                dialog.value.show(errData.message[0] || 'Kunde inte uppdatera användaren');
+                return false;
+            }
+            
+            dialog.value.show('Användaren har uppdaterats');
+
+            getUsers();
+            return true;
+        } catch (err) {
+            console.error(err);
+            dialog.value.show(err.message || 'Ett fel uppstod vid uppdatering av användare');
+            return false;
+        }
+    }
+
+    const updateUser = async(id, payload, done) => {
+        const success = await editUser(id, payload);
+
+        done(success);
+    }
+
+    const removeUser = async(id) => {
+        try {
+            const confirm = window.confirm('Är du säker på att radera användaren');
+            if(!confirm) {
+                return;
+            }
+            const response = await fetch(url + 'users/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if(!response.ok) {
+                const errData = await response.json();
+                dialog.value.show(errData.message[0] || 'Kunde inte radera användaren');
+            }
+            
+            dialog.value.show('Användaren har raderats');
+
+            getUsers();
+        } catch (err) {
+            console.error(err);
+            dialog.value.show(err.message || 'Ett fel uppstod vid radering av användare');
+        }
+    }
+</script>
+
+<style scoped>
+
+</style>
