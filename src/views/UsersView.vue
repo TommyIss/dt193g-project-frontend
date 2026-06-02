@@ -1,16 +1,17 @@
 <template>
-    <h2>Användare</h2>
+    <h2>Användarna</h2>
 
     <AppDialog ref="dialog" />
 
     <div v-if="showAddUser === false && role === 'admin'">
-        <button @click="showAddUser = true">Lägg till ny användare <em class="fa-solid fa-circle-plus"></em></button>
+        <button class="btn btn-success" @click="showAddUser = true">Lägg till ny användare <em class="fa-solid fa-circle-plus"></em></button>
     </div>
 
     <UserForm 
         v-if="showAddUser === true"
         @save="addUser"
         @close="showAddUser = false"
+        :role="role"
     />
 
     <div v-if="loading" class="alert alert-info">
@@ -29,11 +30,14 @@
     import UserForm from '@/components/UserForm.vue';
     import UsersTable from '@/components/UsersTable.vue';
     import { ref, onMounted } from 'vue';
+    import { useRouter } from 'vue-router';
 
+    const router = useRouter();
     const users = ref([]);
     const url = 'https://tois-dt193g-project-webservice.onrender.com/';
 
     const role = JSON.parse(localStorage.getItem('user'))?.role;
+    const inlogedId = JSON.parse(localStorage.getItem('user'))?.id;
     const token = localStorage.getItem('token');
     
     const loading = ref(true);
@@ -57,17 +61,16 @@
 
             if(!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message[0] || 'Kunde inte uppdatera användaren');
+                dialog.value.show(errData.message || 'Kunde inte uppdatera användaren', 'error');
             }
 
             const data = await response.json();
 
-            console.log(data);
             users.value = data;
 
         } catch (err) {
             console.error(err);
-            dialog.value.show(err.message || 'Ett fel uppstod vid hämtning av användare');
+            dialog.value.show(err.message || 'Ett fel uppstod vid hämtning av användare', 'error');
             return false;
         } finally {
             loading.value = false;
@@ -91,18 +94,18 @@
 
             if(!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message[0] || 'Kunde inte lägga till användaren');
+                dialog.value.show(errData.message || 'Kunde inte lägga till användaren', 'error');
                 return false;
             }
             
-            dialog.value.show('Användaren har lagts till');
+            dialog.value.show('Användaren har lagts till', 'success');
 
             showAddUser.value = false;
 
             getUsers();
         } catch (err) {
             console.error(err);
-            dialog.value.show(err.message || 'Ett fel uppstod vid tillägg av användare');
+            dialog.value.show(err.message || 'Ett fel uppstod vid tillägg av användare', 'error');
         }
     }
 
@@ -119,17 +122,17 @@
 
             if(!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message[0] || 'Kunde inte uppdatera användaren');
+                dialog.value.show(errData.message || 'Kunde inte uppdatera användaren', 'error');
                 return false;
             }
             
-            dialog.value.show('Användaren har uppdaterats');
+            dialog.value.show('Användaren har uppdaterats', 'success');
 
             getUsers();
             return true;
         } catch (err) {
             console.error(err);
-            dialog.value.show(err.message || 'Ett fel uppstod vid uppdatering av användare');
+            dialog.value.show(err.message || 'Ett fel uppstod vid uppdatering av användare', 'error');
             return false;
         }
     }
@@ -142,7 +145,13 @@
 
     const removeUser = async(id) => {
         try {
-            const confirm = window.confirm('Är du säker på att radera användaren');
+            
+            let confirm = '';
+            if(inlogedId === id) {
+                 confirm = window.confirm('Om du raderar ditt konto kommer du förlora åtkomst till gränssnittet, är du säker på att radera ditt konto?');
+            } else {
+                confirm = window.confirm('Är du säker på att radera användaren');
+            }
             if(!confirm) {
                 return;
             }
@@ -155,15 +164,20 @@
 
             if(!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message[0] || 'Kunde inte radera användaren');
+                dialog.value.show(errData.message || 'Kunde inte radera användaren', 'error');
             }
             
-            dialog.value.show('Användaren har raderats');
+            if(inlogedId === id) {
+                dialog.value.show('ditt konto har raderats', 'info');
+                router.push('/login');
+            }
+
+            dialog.value.show('Användaren har raderats', 'success');
 
             getUsers();
         } catch (err) {
             console.error(err);
-            dialog.value.show(err.message || 'Ett fel uppstod vid radering av användare');
+            dialog.value.show(err.message || 'Ett fel uppstod vid radering av användare', 'error');
         }
     }
 </script>

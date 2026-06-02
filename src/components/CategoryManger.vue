@@ -8,22 +8,22 @@
       <li 
         v-for="cat in categories" 
         :key="cat.id" 
-        class="list-group-item d-flex justify-content-between align-items-center"
+        class="list-group-item d-flex justify-content-around align-items-center"
       >
-        <span v-if="editingId !== cat.id">{{ cat.name }}</span>
+        <span v-if="editingId !== cat.id" class="w-75">{{ cat.name }}</span>
 
         <!-- Redigera -->
         <input 
           v-else 
           type="text" 
-          class="form-control"
+          class="form-control w-75"
           v-model="editName"
         >
 
         <div>
           <button 
             v-if="editingId !== cat.id"
-            class="btn btn-sm btn-primary me-2"
+            class="btn btn-sm btn-primary m-1"
             @click="startEdit(cat)"
           >
             Redigera
@@ -31,7 +31,7 @@
 
           <button
             v-if="editingId !== cat.id" 
-            class="btn btn-sm btn-danger"
+            class="btn btn-sm btn-danger m-1"
             @click="deleteCategory(cat.id)"
           >
             Radera
@@ -39,7 +39,7 @@
 
           <button 
             v-if="editingId === cat.id"
-            class="btn btn-sm btn-success me-2"
+            class="btn btn-sm btn-success m-1"
             @click="saveEdit(cat.id)"
           >
             Spara
@@ -47,7 +47,7 @@
 
           <button 
             v-if="editingId === cat.id"
-            class="btn btn-sm btn-secondary me-2"
+            class="btn btn-sm btn-secondary m-1"
             @click="stopEdit(cat)"
           >
             Avbryt
@@ -58,23 +58,26 @@
     </ul>
 
     <!-- Lägg till ny kategori -->
-    <div class="input-group">
+    <div class="d-flex flex-wrap">
       <input 
         type="text" 
         class="form-control" 
         placeholder="Ny kategori..."
         v-model="newCategory"
       >
-      <button class="btn btn-success" @click="addCategory">
-        Lägg till
-      </button>
+      <div>
 
-      <button 
-            class="btn btn-sm btn-secondary me-2"
-            @click="closeManger"
-          >
-            Stäng kategori hanterare
-          </button>
+        <button class="btn btn-success m-1" @click="addCategory">
+          Lägg till
+        </button>
+
+        <button 
+              class="btn btn-sm btn-secondary m-1"
+              @click="closeManger"
+            >
+              Stäng kategori hanterare
+            </button>
+      </div>
     </div>
 
   </div>

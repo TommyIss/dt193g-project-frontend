@@ -1,6 +1,6 @@
 <template>
 
-    <h2>Logga in</h2>
+    <h2 class="text-center my-2">Logga in</h2>
 
     <LoginForm />
 </template>

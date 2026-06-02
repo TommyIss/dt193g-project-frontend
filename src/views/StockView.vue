@@ -1,12 +1,17 @@
 <template>
+    <AppDialog ref="dialog" />
+    <div class="d-flex flex-wrap justify-content-evenly my-3">
+        <div v-if="showAddProduct === false && role === 'admin'" class="my-1">
+            <button @click="showAddProduct = true, showCategoryManger = false" class="btn btn-primary">
+                Lägg till ny produkt <em class="fa-solid fa-circle-plus"></em>
+            </button>
+        </div>
 
-    <div v-if="showAddProduct === false && role === 'admin'">
-        <button @click="showAddProduct = true">Lägg till ny produkt <em class="fa-solid fa-circle-plus"></em></button>
+        <div v-if="showCategoryManger === false && role === 'admin'" class="my-1">
+            <button @click="showCategoryManger = true, showAddProduct = false" class="btn btn-primary">Hantera kategorier <em class="fa-solid fa-gears"></em></button>
+        </div>
     </div>
-
-    <div v-if="showCategoryManger === false && role === 'admin'">
-        <button @click="showCategoryManger = true">Hantera kategorier <em class="fa-solid fa-circle-plus"></em></button>
-    </div>
+    
 
     <ProductForm 
         v-if="showAddProduct === true && role === 'admin'"
@@ -25,14 +30,6 @@
         @closeManger="showCategoryManger = false"
     />
 
-    <div v-if="loading" class="alert alert-info">
-        Hämtar produkter...
-    </div>
-
-    <div v-if="error" class="alert alert-danger">
-        {{ error }}
-    </div>
-
     <div  class="my-3">
         <label class="form-label">Sök efter produktnamn:</label>
         <input 
@@ -44,7 +41,7 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Kategori:</label>
+      <label class="form-label">Fitrera efter kategori:</label>
       <select 
         class="form-control" 
         v-model="categoryId"
@@ -63,6 +60,10 @@
     <p class="text-muted">
         Visar {{ filteredProducts.length }} produkter
     </p>
+    <div v-if="loading" class="alert alert-info">
+        Hämtar produkter...
+    </div>
+
     <div class="stock">
         <StockArticle v-for="article in filteredProducts"
         :id="article.id"
@@ -77,6 +78,7 @@
 </template>
 
 <script setup>
+    import AppDialog from '@/components/AppDialog.vue';
     import CategoryManger from '@/components/CategoryManger.vue';
     import ProductForm from '@/components/ProductForm.vue';
     import StockArticle from '@/components/StockArticle.vue';
@@ -88,7 +90,7 @@
     let showCategoryManger = ref(false);
     const error = ref('');
     const loading = ref(true);
-
+    const dialog = ref(null);
     const role = JSON.parse(localStorage.getItem('user'))?.role;
 
     const url = 'https://tois-dt193g-project-webservice.onrender.com/';
@@ -115,12 +117,13 @@
             });
 
             if(!productResponse.ok) {
-                throw new Error('Kunde inte uppdatera lagersaldo');
+                const errData = await response.json();
+                dialog.value.show(errData.message || 'Kunde inte hämta produkter i lagret', 'error');
             }
             const productData = await productResponse.json();
             stockArticles.value = productData;
         } catch (err) {
-            error.value = err.message || 'Ett fel uppstod vid uppdatering av lagersaldo';
+            dialog.value.show(err.message || 'Ett fel uppstod vid hämtning av lagersaldo', 'error');
         } finally {
             loading.value = false;
         }
@@ -137,13 +140,15 @@
             });
 
             if(!response.ok) {
-                throw new Error('Kunde inte lägga till produkten!');
+                const errData = await response.json();
+                dialog.value.show(errData.message ||'Kunde inte lägga till produkten!', 'error');
             }
 
+            dialog.value.show('Produkten har lagts till', 'success');
             getStock();
         } catch (err) {
             console.error(err);
-            error.value = err.message || 'Ett fel uppstod vid tillägg av produkten';
+            dialog.value.show(err.message || 'Ett fel uppstod vid tillägg av produkten', 'error');
         }
     }
 
@@ -157,13 +162,14 @@
             });
 
             if(!response.ok) {
-                throw new Error('Kunde inte hämta kategorier!');
+                const errData = await response.json();
+                dialog.value.show(errData.message || 'Kunde inte hämta kategorier!', 'error');
             }
 
             categories.value = await response.json();
         } catch (err) {
             console.error(err);
-            error.value = err.message || 'Ett fel uppstod vid hämtning av kategorier';
+            dialog.value.show(err.message || 'Ett fel uppstod vid hämtning av kategorier', 'error');
         }
     }
 
@@ -192,6 +198,7 @@
     margin: 2% 0;
     display: flex;
     flex-direction: row;
+    justify-content: space-around;
     flex-wrap: wrap;
 }
 </style>

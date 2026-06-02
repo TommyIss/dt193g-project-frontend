@@ -2,22 +2,22 @@
   <form @submit.prevent="submitForm">
     <div class="mb-3">
       <label class="form-label">Förnamn:</label>
-      <input type="text" class="form-control" v-model="form.firstname" required>
+      <input type="text" class="form-control" v-model="form.firstname">
     </div>
 
     <div class="mb-3">
       <label class="form-label">Efternamn:</label>
-      <input type="text" class="form-control" v-model="form.lastname" required>
+      <input type="text" class="form-control" v-model="form.lastname">
     </div>
 
     <div class="mb-3">
       <label class="form-label">E-post:</label>
-      <input type="email" class="form-control" v-model="form.email" required>
+      <input type="email" class="form-control" v-model="form.email">
     </div>
 
     <div class="mb-3">
       <label class="form-label">Lösenord:</label>
-      <input type="password" class="form-control" v-model="form.password" required>
+      <input type="password" class="form-control" v-model="form.password">
     </div>
 
     <div class="mb-3" v-if="role === 'admin'">
@@ -27,7 +27,7 @@
             class="form-control"
         >
             <option value="staff">
-                Lagermedarbetare
+                Lagerpersonal
             </option>
             
             <option value="admin">
@@ -41,7 +41,7 @@
     <button class="btn btn-success">
         Spara
     </button>
-    <button class="btn btn-secondary me-2 mx-2" @click="close">
+    <button type="button" class="btn btn-secondary me-2 mx-2" @click="close">
         Avbryt
     </button>
 
@@ -84,10 +84,12 @@
             firstname: form.firstname,
             lastname: form.lastname,
             email: form.email,
-            password: form.password,
             role: form.role
         };
 
+        if (form.password.trim() !== '') {
+            userData.password = form.password;
+        }
         if(props.mode === 'edit') {
             emit('save', form.id, userData );
         } else {

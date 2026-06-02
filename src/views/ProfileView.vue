@@ -1,16 +1,19 @@
 <template>
 
     <AppDialog ref="dialog" />
+
     <h2>Profil</h2>
     <h3>Välkommen {{ userDetails.firstname }}</h3>
 
-    <div v-if="isEditing === false">
+    <div v-if="isEditing === false" class="card shadow-sm mt-4 p-4 mx-auto"
+    style="max-width: 500px;"
+    >
         <p>Fullstandiga namn: {{ userDetails.firstname }} {{ userDetails.lastname }}</p>
         <p>E-post: {{ userDetails.email }}</p>
         <p>Lösenord: ********</p>
         <p>Roll: {{ userDetails.role === 'staff' ? 'Lagermedarbetare' : 'Admin' }}</p>
         <button 
-            class="btn btn-warning btn-sm me-2" 
+            class="btn btn-warning btn-sm w-50" 
             @click="isEditing = true">
             Redigera dina uppgifter
         </button>
@@ -62,6 +65,12 @@
                 }
             });
 
+            if(!profileRes.ok) {
+                const errData = await profileRes.json();
+                dialog.value.show(errData.message || 'Kunde inte hämta dina uppgifter');
+                return false;
+            }
+
             const profileData = await profileRes.json();
 
             let userProfile = profileData.userProfile;
@@ -93,11 +102,11 @@
 
             if(!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message || 'Kunde inte uppdatera dina uppgifter');
+                dialog.value.show(errData.message || 'Kunde inte uppdatera dina uppgifter', 'error');
                 return false;
             }
             
-            dialog.value.show('Dina uppgifter har uppdaterats');
+            dialog.value.show('Dina uppgifter har uppdaterats', 'success');
 
             isEditing.value = false;
 
@@ -105,7 +114,7 @@
             
         } catch (err) {
             console.error(err);
-            dialog.value.show(err.message || 'Ett fel uppstod vid uppdatering av dina uppgifet');
+            dialog.value.show(err.message || 'Ett fel uppstod vid uppdatering av dina uppgifter', 'error');
             return false;
         }
     }

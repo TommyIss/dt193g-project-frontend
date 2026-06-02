@@ -1,18 +1,18 @@
 <template>
-    <form @submit.prevent="login">
-        <label for="email">E-post:</label>
+    <form class="border border-success rounded py-3 px-4 mt-4" @submit.prevent="login">
+        <label class="form-label">E-post:</label>
         <br>
-        <input type="text" name="email" id="email" v-model="loginCredentials.email" required>
+        <input type="text" class="form-control" v-model="loginCredentials.email" required>
     
         <br>
 
-        <label for="password">Lösenord:</label>
+        <label class="form-label">Lösenord:</label>
         <br>
-        <input type="password" name="password" id="password" v-model="loginCredentials.password" required>
+        <input type="password" class="form-control" v-model="loginCredentials.password" required>
 
         <br>
 
-        <input type="submit" value="Logga in">
+        <input type="submit" class="btn btn-success" value="Logga in">
         <span class="error" v-if="error">{{ error }}</span>
     </form>
 </template>
@@ -101,45 +101,11 @@
         margin: 0 auto;
     }
 
-    label {
-        font-weight: bold;
-        font-size: 1.4em;
-    }
-
-    input[type='text'], input[type='number'], select {
-        max-width: 400px;
-        padding: 0.5em;
-        width: 100%;
-    }
-
-    input[type='submit'] {
-        max-width: 100px;
-        padding: 0.6em;
-        width: 100%;
-        margin-left: 1em;
-        background-color: #42b883;
-        color: white;
-        text-transform: uppercase;
-        border: none;
-        border-radius: 5px;
-        transition: 0.3s;
-        cursor: pointer;
-    }
-
-    input[type='submit']:hover {
-        background-color: #35495e;
-    }
-
     @media screen and (max-width: 800px) {
         form {
             width: 90%;
         }
 
-        input[type='text'] {
-            max-width: 400px;
-            padding: 0.5em;
-            width: 90%;
-        }
     }
 
     @media screen and (max-width: 587px) {

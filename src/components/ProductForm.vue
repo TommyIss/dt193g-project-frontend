@@ -146,7 +146,6 @@
 
     const onFileChange = (event) => {
         imageFile.value = event.target.files[0];
-        console.log("FILE SELECTED:", imageFile.value);
     }
 
     const removeVariant = (index) => {
@@ -186,12 +185,6 @@
 
         if(imageFile.value) {
             productData.append("file", imageFile.value);
-        }
-        
-        console.log("FORMDATA DEBUG:");
-        
-        for (let pair of productData.entries()) {
-            console.log(pair[0], pair[1]);
         }
 
         emit('save', productData);

@@ -1,7 +1,7 @@
 <template>
         <header>
         <!-- Logo -->
-        <h1 id="logo"><RouterLink :to="logoRoute">LagerFöretag</RouterLink></h1>
+        <h1 id="logo"><RouterLink :to="logoRoute">StockMaster</RouterLink></h1>
         <!-- Menyknapp för att öppna navigeringsmeny i mobil läge  -->
         <button class="menu-btn open" id="open-menu" @click="toggleMenu" ref="openBtnRef">
             <span class="menu-icon">
@@ -23,20 +23,24 @@
             </button> 
             <ul class="nav-list">
                 <li v-if="!isLoggedIn">
-                    <RouterLink to="/">Logga in</RouterLink>
+                    <RouterLink to="/"><i class="fa-solid fa-arrow-right-to-bracket"></i>Logga in</RouterLink>
                 </li>
                 <template v-if="isLoggedIn">
                     <li>
-                    <RouterLink to="/profile">Profil</RouterLink>
+                    <RouterLink to="/profile">
+                        <em class="fa-solid fa-circle-user"></em> Profil
+                    </RouterLink>
                     </li>
                     <li v-if="role === 'admin'">
-                        <RouterLink to="/users">Användare</RouterLink>
+                        <RouterLink to="/users"><em class="fa-solid fa-users"></em> Användarna</RouterLink>
                     </li>
                     <li>
-                        <RouterLink to="/stock">Lagersaldo</RouterLink>
+                        <RouterLink to="/stock">
+                            <em class="fa-solid fa-boxes-stacked"></em> Lagersaldo
+                        </RouterLink>
                     </li>
                     <li>
-                        <button class="btn btn-link nav-link" @click="logout">Logga ut</button>
+                        <button class="btn btn-link nav-link" @click="logout"><em class="fa-solid fa-arrow-right-from-bracket"></em> Logga ut</button>
                     </li>
                 </template>
                 
@@ -97,18 +101,30 @@
 
         document.addEventListener('click', clickOutside);
 
-        window.addEventListener('auth-changed', () => {
-            const token = localStorage.getItem('token');
-            const user = JSON.parse(localStorage.getItem('user'));
-            if(token && user) {
-                isLoggedIn.value = true;
-                role.value = user.role;
-            }else {
-                isLoggedIn.value = false;
-                role.value = '';
-            }
-        })
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        if(token && user) {
+            isLoggedIn.value = true;
+            role.value = user.role;
+        }else {
+            isLoggedIn.value = false;
+            role.value = '';
+            router.push('/login');
+        }
     });
+
+    window.addEventListener('auth-changed', () => {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        if(token && user) {
+            isLoggedIn.value = true;
+            role.value = user.role;
+        }else {
+            isLoggedIn.value = false;
+            role.value = '';
+            router.push('/login');
+        }
+    })    
 
     let toggleMenu = () => {
         menuDisplay.value = menuDisplay.value === 'none' ? 'block': 'none';
@@ -119,7 +135,7 @@
         localStorage.removeItem('user');
 
         isLoggedIn.value = false;
-        router.push('/');
+        router.push('/login');
     }
 </script>
 
@@ -134,7 +150,7 @@
         align-items: center;
         justify-content: space-evenly;
         width: 100%;
-        padding: 0.5% 0;
+        padding: 1% 0;
     }
 
     /* Logo */
@@ -158,7 +174,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        
+        margin: 0;
     }
 
     .nav-list > li {
@@ -176,7 +192,7 @@
         color: #EEEEEE;
     }
 
-    a:hover {
+    a:hover, .nav-link:hover {
         color: #00AEFF;
         text-decoration: underline;
     }
@@ -192,6 +208,9 @@
     }
 
     @media screen and (max-width: 800px) {
+        header {
+            padding: 2% 0;
+        }
         /* Navigeringsmeny i mobilläge */
         #nav-menu{
             position: absolute;
@@ -200,11 +219,12 @@
             background-color: #1F6F5F;
             width: 75%;
             margin: 0;
+            z-index: 20000;
         }
         .nav-list{
+            display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            text-align: center;
+            align-items: center;
             margin: 0 auto;
             padding: 5% 0;
             height: 100%;
@@ -212,14 +232,14 @@
         }
         .nav-list > li {
             padding: 0.8em 0;
-            width: 100%;
+            width: auto;
         }
         /* Öppen knapp */
         .open {
             display: block;
             position: absolute;
             right: 1%;
-            top: 1%;
+            top: 0.5%;
             padding: 0;
         }
         .menu-btn {
@@ -249,9 +269,9 @@
         }
         /* Stängknapp */
         .close {
-            margin: 1em 1.5em;
-            right: 2%;
-            top: 2%;
+            margin: 0.5em;
+            right: 1%;
+            top: 0.5%;
         }
         .cross1 {
             width: 25px;

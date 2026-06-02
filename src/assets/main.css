@@ -13,34 +13,13 @@ body {
     line-height: 2.6em;
 }
 
-table, p {
+table {
     width: 90%;
     margin: 0 auto;
 }
 
-p {
-    margin: 1% auto;
-}
 table {
     border: 1px solid black;
-}
-
-td {
-    margin: 0 1%;
-    padding: 0 4px;
-    border: 1px solid black;
-    font-size: 0.9em;
-    text-align: center;
-}
-
-th {
-    background-color: #3B9797;
-    border: 1px solid black;
-    color: white;
-}
-tr:nth-child(even) {
-    background-color: #3B9797;
-    color: white;
 }
 
 button {
