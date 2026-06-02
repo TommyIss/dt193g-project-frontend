@@ -1,42 +1,24 @@
-# frontend
+# Projekt i kursen DT193G, Fullstack-utveckling med ramverk
 
-This template should help get you started developing with Vue 3 in Vite.
+## Frontend
+Detta är front-delen av ett lagerhanteringssytem som utvecklats som en del av ett fullstack-projekt.
+Applikationen är byggd i Vue och fungerar som användargränssnittet mot ett REST-API som hanterar produkter, varianter, lagersaldo och användare.
 
-## Recommended IDE Setup
+## Funktioner i applikationen
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### Inloggning och roller
+Applikationen innehåller ett inloggningssystem baserat på JWT-token, där användaren får tillgång till olika funktioner beroende på sin roll. Administratörer har full åtkomst till alla delar av systemet, medan lagerpersonal endast ser de funktioner som är relevanta för deras arbete.
 
-## Recommended Browser Setup
+### Produkthantering
+Systemet gör det möjligt att visa en komplett lista över produkter och öppna en detaljerad vy för varje produkt. Administratörer kan redigera produktinformation, ladda upp nya produkter samt produktbilder och ta bort produkter vid behov.
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+### Varianthantering
+För varje produkt kan användaren se alla tillhörande varianter, exempelvis olika storleker, priser och lagersaldo. Lagerpersonal kan uppdatera lagersaldo direkt i sidan, medan administratörer har behörighet för att lägga till nya varianter, redigera och radera de befintliga.
 
-## Type Support for `.vue` Imports in TS
+### Användarhantering
+Administratörer har dessutom tillgång till användarhantering, där de kan skapa nya användare, redigera befintliga och tilldela roller.
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### Profilredigering
+Både lagerpersonal och administratörer har möjlighet att redigera sina egna uppgifter, såsom förnamn, efternamn, e-post och lösenord.
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
+#### Tommy Issa, tois2401
