@@ -97,7 +97,7 @@
     const editingId = ref(null);
     const editName = ref('');
 
-    const emits = defineEmits(['getCategories', 'closeManger'])
+    const emits = defineEmits(['getCategories', 'closeManger', 'getProducts'])
 
     const getCategories = async () => {
         try {
@@ -106,7 +106,8 @@
             });
             categories.value = await res.json();
         } catch (err) {
-            
+            console.error(err);
+            props.error = err.message || 'Ett fel uppstod vid hämtning av kategorier';
         }
     
     };
@@ -130,7 +131,7 @@
 
             newCategory.value = '';
             getCategories();
-
+            
         } catch (err) {
             console.error(err);
             props.error = err.message || 'Ett fel uppstod vid tillägg av kategorin';
@@ -156,6 +157,7 @@
             }
 
             getCategories();
+            emits('getProducts');
         } catch (err) {
             console.error(err);
             props.error = err.message || 'Ett fel uppstod vid radering av kategorin';
@@ -168,7 +170,7 @@
         editName.value = cat.name;
     };
 
-    const stopEdit = (cat) => {
+    const stopEdit = () => {
         editingId.value = null;
         editName.value = '';
     };

@@ -2,7 +2,7 @@
   <form @submit.prevent="submitForm">
     <div class="mb-3">
       <label class="form-label">Produktnamn:</label>
-      <input type="text" class="form-control" v-model="form.name" required>
+      <input type="text" class="form-control" v-model="form.name" >
     </div>
 
     <div class="mb-3">
@@ -47,12 +47,12 @@
 
             <div class="col-md-4">
                 <label for="price">Pris:</label>
-                <input type="number" class="form-control" v-model="variant.price" required>
+                <input type="number" class="form-control" v-model="variant.price">
             </div>
 
             <div class="col-md-4">
                 <label for="stock_quantity">Lagersaldo:</label>
-                <input type="number" class="form-control" v-model="variant.stock_quantity" required>
+                <input type="number" class="form-control" v-model="variant.stock_quantity">
             </div>
 
             <div class="col-md-1 d-flex align-items-end">
@@ -157,7 +157,7 @@
 
         if(categoryId === 'new') {
             try {
-                const res = await fetch(props.url + 'categories', {
+                const response = await fetch(props.url + 'categories', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -192,23 +192,36 @@
 
     const getCategories = async() => {
         try {
-            const res = await fetch(props.url + 'categories', {
+            const response = await fetch(props.url + 'categories', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${props.token}`
                 }
             });
 
-            if(!res.ok) {
-                throw new Error('Kunde inte hämta kategories');
+            if (!response.ok) {
+                const errData = await response.json();
+                let finalErrorMessage = 'Kunde inte hämta kategorier';
+
+                if (errData.message) {
+                    if (Array.isArray(errData.message)) {
+                        finalErrorMessage = errData.message.join(', ');
+                    } else {
+                        finalErrorMessage = errData.message;
+                    }
+                } else if (errData.error) {
+                    finalErrorMessage = errData.error;
+                }
+
+                error.value = finalErrorMessage;
+                return;
             }
-            const data = await res.json();
-            categories.value = data;
-            
+
+            categories.value = await response.json();
         } catch (err) {
+            console.error(err);
             error.value = err.message || 'Ett fel uppstod vid hämtning av kategorier';
         }
-        
     }
 
     const close = () => emit('close');

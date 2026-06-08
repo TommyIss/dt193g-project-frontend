@@ -41,7 +41,7 @@
         error.value = '';
 
         try {
-            const res = await fetch(props.url + 'variants', {
+            const response = await fetch(props.url + 'variants', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,8 +53,20 @@
                 })
             });
 
-            if(!res.ok) {
-                throw new Error('Kunde inte skapa variant');
+            if (!response.ok) {
+                const errData = await response.json();
+                let finalErrorMessage = 'Kunde inte spara varianten';
+
+                if (errData.message) {
+                    if (Array.isArray(errData.message)) {
+                        finalErrorMessage = errData.message.join(', ');
+                    } else {
+                        finalErrorMessage = errData.message;
+                    }
+                } else if (errData.error) {
+                    finalErrorMessage = errData.error;
+                }
+                return;
             }
 
             emit('saved');

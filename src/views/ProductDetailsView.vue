@@ -64,7 +64,11 @@
 
                     <div>
                         <label for="productCategory">Kategori:</label>
-                        <input type="text" class="form-control" v-model="product.category.name">
+                        <select class="form-control" v-model="product.categoryId">
+                            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                                {{ cat.name }}
+                            </option>
+                        </select>
                     </div>
 
                     <div>
@@ -93,15 +97,11 @@
                 Lägg till variant
             </button>
 
-            <VariantForm 
-                v-if="showAddVariant && role === 'admin'" :productId="product.id" :token="token" :url="url"
-                @saved="getProductsDetails" @close="showAddVariant = false" 
-            />
+            <VariantForm v-if="showAddVariant && role === 'admin'" :productId="product.id" :token="token" :url="url"
+                @saved="getProductsDetails" @close="showAddVariant = false" />
 
-            <VariantTable
-                :variants="product.variants" :role="role"             @updateStock="updateStock"
-                @updateVariant="editVariant" @delete="deleteVariant" 
-            />
+            <VariantTable :variants="product.variants" :role="role" @updateStock="updateStock"
+                @updateVariant="editVariant" @delete="deleteVariant" />
         </div>
 
     </div>
@@ -117,7 +117,7 @@ import AppDialog from '@/components/AppDialog.vue';
 const dialog = ref(null);
 const route = useRoute();
 const router = useRouter();
-
+const categories = ref([]);
 const product = ref(null);
 const imageFile = ref(null);
 const loading = ref(true);
@@ -130,6 +130,7 @@ const showAddVariant = ref(false);
 const productEditing = ref(false);
 
 onMounted(() => {
+    getCategories();
     getProductsDetails();
 });
 
@@ -147,19 +148,66 @@ let getProductsDetails = async () => {
 
         if (!response.ok) {
             const errData = await response.json();
-            dialog.value.show(errData.message || 'Kunde inte hämta productData', 'error');
+            let finalErrorMessage = 'Kunde inte hämta produktdetaljer';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
             return;
         }
+
 
         const productData = await response.json();
 
         product.value = productData;
-        
+
     } catch (err) {
         console.error(err);
         dialog.value.show(err.message || 'Ett fel uppstod vid hämtning av produkt', 'error');
     } finally {
         loading.value = false;
+    }
+}
+
+const getCategories = async () => {
+    try {
+        const response = await fetch(url + 'categories', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            const errData = await response.json();
+            let finalErrorMessage = 'Kunde inte hämta kategorier';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
+            return;
+        }
+
+        categories.value = await response.json();
+    } catch (err) {
+        console.error(err);
+        dialog.value.show(err.message || 'Ett fel uppstod vid hämtning av kategorier', 'error');
     }
 }
 
@@ -177,7 +225,19 @@ let updateStock = async (id, amount) => {
 
         if (!response.ok) {
             const errData = await response.json();
-            dialog.value.show(errData.message || 'Kunde inte uppdatera lagersaldo', 'error');
+            let finalErrorMessage = 'Kunde inte uppdatera lagersaldo';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
             return;
         }
 
@@ -191,34 +251,47 @@ let updateStock = async (id, amount) => {
 }
 
 // Admin - funktionalitet
-    const editVariant = async (id, updatedVariant, callback) => {
-        try {
-            const response = await fetch(url + `variants/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(updatedVariant)
-            });
+const editVariant = async (id, updatedVariant, callback) => {
+    try {
+        const response = await fetch(url + `variants/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedVariant)
+        });
 
-            if (!response.ok) {
-                const errData = await response.json();
-                dialog.value.show(errData.message || 'Kunde inte uppdatera variant', 'error');
-                callback?.(false);
-                return;
+
+        if (!response.ok) {
+            const errData = await response.json();
+            let finalErrorMessage = 'Kunde inte uppdatera variant';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
             }
 
-            dialog.value.show('Varianten har uppdaterats', 'success');
-
-            await getProductsDetails();
-            callback?.(true);
-        } catch (err) {
-            console.error(err);
-            dialog.value.show(err.message || 'Ett fel uppstod vid uppdatering av variant', 'error');
+            dialog.value.show(finalErrorMessage, 'error');
             callback?.(false);
+            return;
         }
+
+        dialog.value.show('Varianten har uppdaterats', 'success');
+
+        await getProductsDetails();
+        callback?.(true);
+    } catch (err) {
+        console.error(err);
+        dialog.value.show(err.message || 'Ett fel uppstod vid uppdatering av variant', 'error');
+        callback?.(false);
     }
+}
 
 const deleteVariant = async (id) => {
     try {
@@ -234,7 +307,19 @@ const deleteVariant = async (id) => {
 
         if (!response.ok) {
             const errData = await response.json();
-            dialog.value.show(errData.message || 'Kunde inte ta bort variant', 'error');
+            let finalErrorMessage = 'Kunde inte radera variant';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
             return;
         }
 
@@ -249,27 +334,52 @@ const deleteVariant = async (id) => {
 
 const editProduct = async (id, updatedProduct) => {
     try {
-        const payload = {
-            name: updatedProduct.name,
-            description: updatedProduct.description,
-            categoryId: updatedProduct.categoryId
+        let formData = new FormData();
+
+        formData.append('name', updatedProduct.name ?? '');
+        formData.append('description', updatedProduct.description ?? '');
+        formData.append('categoryId', String(updatedProduct.categoryId));
+
+        if (updatedProduct.variants && updatedProduct.variants.length > 0) {
+            const cleaned = updatedProduct.variants.map(v => ({
+                size: v.size,
+                price: v.price,
+                stock_quantity: v.stock_quantity
+            }));
+
+            formData.append('variants', JSON.stringify(cleaned));
         }
         const response = await fetch(url + `products/${id}`, {
             method: 'PATCH',
             headers: {
                 'authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(payload)
+            body: formData
         });
 
         if (!response.ok) {
             const errData = await response.json();
-            dialog.value.show(errData.message ||'Kunde inte uppdatera produkten', 'error');
+            let finalErrorMessage = 'Kunde inte uppdatera produkt';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message
+                        .map(err => err.message || JSON.stringify(err))
+                        .join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
             return;
         }
 
-        if (product.value) {
+        if (imageFile.value) {
             await editImage(id);
+            imageFile.value = null;
         }
 
         dialog.value.show("Produkten har uppdaterats!");
@@ -299,7 +409,19 @@ const editImage = async (id) => {
 
         if (!response.ok) {
             const errData = await response.json();
-            dialog.value.show(errData.message ||'Kunde inte uppdatera bilden', 'error');
+            let finalErrorMessage = 'Kunde inte uppdatera produktbild';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
             return;
         }
 
@@ -323,7 +445,19 @@ const deleteProduct = async (id) => {
 
         if (!response.ok) {
             const errData = await response.json();
-            dialog.value.show(errData.message ||'Kunde inte ta bort produkter', 'error');
+            let finalErrorMessage = 'Kunde inte radera produkt';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
             return;
         }
 
@@ -348,8 +482,20 @@ const deleteImage = async (id) => {
 
         if (!response.ok) {
             const errData = await response.json();
-                dialog.value.show(errData.message ||'Kunde inte radera bilden', 'error');
-                return;
+            let finalErrorMessage = 'Kunde inte radera produktbild';
+
+            if (errData.message) {
+                if (Array.isArray(errData.message)) {
+                    finalErrorMessage = errData.message.join(', ');
+                } else {
+                    finalErrorMessage = errData.message;
+                }
+            } else if (errData.error) {
+                finalErrorMessage = errData.error;
+            }
+
+            dialog.value.show(finalErrorMessage, 'error');
+            return;
         }
 
     } catch (err) {
@@ -365,31 +511,34 @@ const onFileChange = (event) => {
 </script>
 
 <style scoped>
+.product-image {
+    width: 100%;
+    height: 300px;
+}
+
+#quantity {
+    max-width: 10ch;
+}
+
+.breadcrumb-item,
+.breadcrumb-item a {
+    text-decoration: none;
+    color: black;
+}
+
+.breadcrumb .active {
+    text-decoration: underline;
+}
+
+.breadcrumb-item a:hover {
+    color: #00AEFF;
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 700px) {
     .product-image {
         width: 100%;
         height: 300px;
     }
-
-    #quantity {
-        max-width: 10ch;
-    }
-
-    .breadcrumb-item, .breadcrumb-item a {
-        text-decoration: none;
-        color: black;
-    }
-    .breadcrumb .active {
-        text-decoration: underline;
-    }
-    .breadcrumb-item a:hover {
-        color: #00AEFF;
-        text-decoration: underline;
-    }
-
-    @media screen and (max-width: 700px) {
-        .product-image {
-            width: 100%;
-            height: 300px;
-        }
-    }
+}
 </style>

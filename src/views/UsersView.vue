@@ -59,9 +59,22 @@
                 }
             });
 
-            if(!response.ok) {
+            if (!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message || 'Kunde inte uppdatera användaren', 'error');
+                let finalErrorMessage = 'Kunde inte hämta användarna';
+
+                if (errData.message) {
+                    if (Array.isArray(errData.message)) {
+                        finalErrorMessage = errData.message.join(', ');
+                    } else {
+                        finalErrorMessage = errData.message;
+                    }
+                } else if (errData.error) {
+                    finalErrorMessage = errData.error;
+                }
+
+                dialog.value.show(finalErrorMessage, 'error');
+                return false;
             }
 
             const data = await response.json();
@@ -92,10 +105,22 @@
                 body: JSON.stringify(user)
             });
 
-            if(!response.ok) {
+            if (!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message || 'Kunde inte lägga till användaren', 'error');
-                return false;
+                let finalErrorMessage = 'Kunde inte lägga till användaren';
+
+                if (errData.message) {
+                    if (Array.isArray(errData.message)) {
+                        finalErrorMessage = errData.message.join(', ');
+                    } else {
+                        finalErrorMessage = errData.message;
+                    }
+                } else if (errData.error) {
+                    finalErrorMessage = errData.error;
+                }
+
+                dialog.value.show(finalErrorMessage, 'error');
+                return;
             }
             
             dialog.value.show('Användaren har lagts till', 'success');
@@ -120,9 +145,21 @@
                 body: JSON.stringify(user)
             });
 
-            if(!response.ok) {
+            if (!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message || 'Kunde inte uppdatera användaren', 'error');
+                let finalErrorMessage = 'Kunde inte uppdatera användaren';
+
+                if (errData.message) {
+                    if (Array.isArray(errData.message)) {
+                        finalErrorMessage = errData.message.join(', ');
+                    } else {
+                        finalErrorMessage = errData.message;
+                    }
+                } else if (errData.error) {
+                    finalErrorMessage = errData.error;
+                }
+
+                dialog.value.show(finalErrorMessage, 'error');
                 return false;
             }
             
@@ -162,9 +199,22 @@
                 }
             });
 
-            if(!response.ok) {
+            if (!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message || 'Kunde inte radera användaren', 'error');
+                let finalErrorMessage = 'Kunde inte radera användaren';
+
+                if (errData.message) {
+                    if (Array.isArray(errData.message)) {
+                        finalErrorMessage = errData.message.join(', ');
+                    } else {
+                        finalErrorMessage = errData.message;
+                    }
+                } else if (errData.error) {
+                    finalErrorMessage = errData.error;
+                }
+
+                dialog.value.show(finalErrorMessage, 'error');
+                return;
             }
             
             if(inlogedId === id) {

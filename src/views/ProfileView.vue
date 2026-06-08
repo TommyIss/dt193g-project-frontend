@@ -100,9 +100,21 @@
                 body: JSON.stringify(user)
             });
 
-            if(!response.ok) {
+            if (!response.ok) {
                 const errData = await response.json();
-                dialog.value.show(errData.message || 'Kunde inte uppdatera dina uppgifter', 'error');
+                let finalErrorMessage = 'Kunde inte uppdatera dina uppgifter';
+
+                if (errData.message) {
+                    if (Array.isArray(errData.message)) {
+                        finalErrorMessage = errData.message.join(', ');
+                    } else {
+                        finalErrorMessage = errData.message;
+                    }
+                } else if (errData.error) {
+                    finalErrorMessage = errData.error;
+                }
+
+                dialog.value.show(finalErrorMessage, 'error');
                 return false;
             }
             
